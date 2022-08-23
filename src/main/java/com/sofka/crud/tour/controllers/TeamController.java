@@ -3,9 +3,11 @@ package com.sofka.crud.tour.controllers;
 import com.sofka.crud.tour.models.Team;
 import com.sofka.crud.tour.services.TeamService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
+import java.util.List;
 
 @CrossOrigin
 @RestController
@@ -16,28 +18,45 @@ public class TeamController {
     TeamService teamService;
 
     @GetMapping()
-    public ArrayList<Team> getTeams() {
-        return teamService.getAllTeams();
+    public ResponseEntity<List<Team>> getTeams() {
+        return ResponseEntity.ok(teamService.getAllTeams());
     }
 
     @GetMapping(path = "/{id}")
-    public Team getTeamById(@PathVariable("id") String id) {
-        return teamService.getTeamById(id);
+    public ResponseEntity<Team>  getTeamById(@PathVariable("id") String id) {
+        try{
+            return  ResponseEntity.ok(teamService.getTeamById(id));
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
     }
 
     @PostMapping()
-    public Team postNewTeam(@RequestBody Team newTeam){
-        return teamService.createTeam(newTeam);
+    public ResponseEntity<Team> postNewTeam(@RequestBody Team newTeam){
+        try{
+            return ResponseEntity.ok(teamService.createTeam(newTeam));
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
     }
 
     @DeleteMapping(path = "/{id}")
-    public String deleteTeam(@PathVariable("id") String id){
-        return teamService.deleteTeamById(id);
+    public ResponseEntity<String> deleteTeam(@PathVariable("id") String id){
+        try{
+            String operationStatus = teamService.deleteTeamById(id);
+            return ResponseEntity.ok(operationStatus);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
     }
 
-
     @PutMapping("/{id}")
-    public Team updateTeamInfo(@PathVariable("id") String id, @RequestBody Team team){
-        return teamService.updateTeam(id, team);
+    public ResponseEntity<Team>  updateTeamInfo(@PathVariable("id") String id, @RequestBody Team team){
+        try {
+            return ResponseEntity.ok(teamService.updateTeam(id, team));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+
     }
 }

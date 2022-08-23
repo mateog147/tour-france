@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 @Service
 public class TeamService {
@@ -18,29 +19,32 @@ public class TeamService {
     }
 
     public Team createTeam(Team newTeam) {
+        Objects.requireNonNull(newTeam);
+        if(newTeam.getName().isEmpty()){
+            throw new IllegalArgumentException("Name value can not be empty");
+        }
         return repository.save(newTeam);
     }
 
     public Team getTeamById(String id) {
         return repository.findById(id)
-                .orElse(new Team());
+                .orElseThrow();
     }
 
     public String deleteTeamById(String id) {
-        Boolean wasDelete = repository.findById(id).isPresent();
-        if(Boolean.TRUE.equals(wasDelete)){
+        if(Boolean.TRUE.equals(repository.findById(id).isPresent())){
             repository.deleteById(id);
             return "Team deleted - Id: " + id;
         }
-        return "Error: Team Not Found";
+        throw new IllegalArgumentException("Error: Team Not Found:" + id);
     }
 
     public Team updateTeam(String id, Team team) {
-        Boolean wasDelete = repository.findById(id).isPresent();
-        if(Boolean.TRUE.equals(wasDelete)){
+        Objects.requireNonNull(team.getName());
+        if(Boolean.TRUE.equals(repository.findById(id).isPresent())){
             team.setId(id);
-            repository.save(team);
+            return repository.save(team);
         }
-        return new Team();
+        throw new IllegalArgumentException("Param error can not update team with id:" + id);
     }
 }
