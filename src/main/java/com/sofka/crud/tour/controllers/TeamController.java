@@ -1,6 +1,6 @@
 package com.sofka.crud.tour.controllers;
 
-import com.sofka.crud.tour.models.Cyclist;
+import com.sofka.crud.tour.controllers.dtos.TeamDTO;
 import com.sofka.crud.tour.models.Team;
 import com.sofka.crud.tour.services.TeamService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +23,11 @@ public class TeamController {
         return ResponseEntity.ok(teamService.getAllTeams());
     }
 
+    @GetMapping("country/{countryName}")
+    public ResponseEntity<List<Team>> getTeamsByCountry(@PathVariable("countryName") String countryName) {
+        return ResponseEntity.ok(teamService.getAllTeamsByCountry(countryName));
+    }
+
     @GetMapping(path = "/{id}")
     public ResponseEntity<Team>  getTeamById(@PathVariable("id") String id) {
         try{
@@ -33,9 +38,13 @@ public class TeamController {
     }
 
     @PostMapping()
-    public ResponseEntity<Team> postNewTeam(@RequestBody Team newTeam){
+    public ResponseEntity<Team> postNewTeam(@RequestBody TeamDTO newTeam){
         try{
-            return ResponseEntity.ok(teamService.createTeam(newTeam));
+            return ResponseEntity.ok(teamService.createTeam(Team.builder()
+                            .code(newTeam.getCode())
+                            .name(newTeam.getName())
+                            .country(newTeam.getCountry())
+                            .build()));
         }catch (Exception e){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
@@ -52,13 +61,16 @@ public class TeamController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Team>  updateTeamInfo(@PathVariable("id") String id, @RequestBody Team team){
+    public ResponseEntity<Team>  updateTeamInfo(@PathVariable("id") String id, @RequestBody TeamDTO team){
         try {
-            return ResponseEntity.ok(teamService.updateTeam(id, team));
+            Team updatedTeam = Team.builder()
+                    .code(team.getCode())
+                    .name(team.getName())
+                    .country(team.getCountry())
+                    .build();
+            return ResponseEntity.ok(teamService.updateTeam(id, updatedTeam));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
     }
-
-
 }

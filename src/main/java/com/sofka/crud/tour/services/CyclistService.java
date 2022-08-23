@@ -5,6 +5,8 @@ import com.sofka.crud.tour.repositories.CyclistRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 
 @Service
@@ -18,7 +20,9 @@ public class CyclistService {
         Objects.requireNonNull(newCyclist.getFullName());
         verifyRiderNumber(newCyclist.getRiderNumber());
 
-        return repository.save(newCyclist);
+        return repository.save(newCyclist.toBuilder()
+                .nationality(newCyclist.getNationality().toUpperCase(Locale.ROOT))
+                .build());
     }
 
     private void verifyRiderNumber(Integer riderNumber) {
@@ -31,5 +35,16 @@ public class CyclistService {
         if(length > 3){
             throw new IllegalArgumentException("Rider number outside the boundaries of 3 digits");
         }
+    }
+
+    public List<Cyclist> getAll() {
+        return repository.findAll();
+    }
+
+    public List<Cyclist>getByCountry(String countryName) {
+        return repository.findAll()
+                .stream()
+                .filter(cyclist -> cyclist.getNationality().equals(countryName.toUpperCase()))
+                .toList();
     }
 }

@@ -1,24 +1,20 @@
 package com.sofka.crud.tour.services;
 
-import com.sofka.crud.tour.models.Cyclist;
 import com.sofka.crud.tour.models.Team;
 import com.sofka.crud.tour.repositories.TeamRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 @Service
 public class TeamService {
     @Autowired
     TeamRepository repository;
 
-    @Autowired
-    CyclistService cyclistService;
-
-    public ArrayList<Team> getAllTeams(){
+    public List<Team> getAllTeams(){
         return repository.findAll();
     }
 
@@ -45,8 +41,10 @@ public class TeamService {
 
     public Team updateTeam(String id, Team team) {
         Objects.requireNonNull(team.getName());
-        if(Boolean.TRUE.equals(repository.findById(id).isPresent())){
+        Optional<Team> oldTeam = repository.findById(id);
+        if(Boolean.TRUE.equals(oldTeam.isPresent())){
             team.setId(id);
+            team.setRiders(oldTeam.get().getRiders());
             return repository.save(team);
         }
         throw new IllegalArgumentException("Param error can not update team with id:" + id);
@@ -59,13 +57,4 @@ public class TeamService {
                 .toList();
     }
 
-    public String addTeamRider(String id, Cyclist rider) {
-        Objects.requireNonNull(id);
-        Team team  = getTeamById(id);
-        rider.setTeamId(team.getId());
-        Cyclist cyclist = cyclistService.createCyclist(rider);
-        team.addCyclist(cyclist);
-        repository.save(team);
-        return cyclist.getId();
-    }
 }

@@ -35,6 +35,18 @@ public class Team {
 
     public void addCyclist(Cyclist cyclist){
         Objects.requireNonNull(cyclist);
+        if(this.riders.size() >= 8 ){
+            throw new IllegalStateException("Team riders number is already the maximum");
+        }
         this.riders.add(cyclist);
+    }
+
+    public void removeCyclist(Cyclist cyclist){
+        Objects.requireNonNull(cyclist);
+        try{
+            this.riders.remove(cyclist);
+        } catch (Exception e) {
+            throw new IllegalStateException("Can not remove the cyclist from the given team");
+        }
     }
 }
