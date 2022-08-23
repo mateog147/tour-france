@@ -11,6 +11,6 @@ public class Cyclist {
     private String id;
     private String teamId;
     private String fullName;
-    private String riderNumber;
+    private Integer riderNumber;
     private String nationality;
 }
