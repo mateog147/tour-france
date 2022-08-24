@@ -9,12 +9,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.logging.Logger;
 
 @CrossOrigin
 @RestController
 @RequestMapping("/api/team")
 public class TeamController {
 
+    private final Logger logger = Logger.getLogger("logger");
     @Autowired
     TeamService teamService;
 
@@ -70,6 +72,7 @@ public class TeamController {
                     .build();
             return ResponseEntity.ok(teamService.updateTeam(id, updatedTeam));
         } catch (Exception e) {
+            logger.info(e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
     }

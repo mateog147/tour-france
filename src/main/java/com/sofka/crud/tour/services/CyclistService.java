@@ -25,6 +25,36 @@ public class CyclistService {
                 .build());
     }
 
+    public List<Cyclist> getAll() {
+        return repository.findAll();
+    }
+
+    public List<Cyclist>getByCountry(String countryName){
+        return repository.findAll()
+                .stream()
+                .filter(cyclist -> cyclist.getNationality().equals(countryName.toUpperCase()))
+                .toList();
+    }
+
+    public String deleteById(String id) {
+        Cyclist cyclist = repository.findById(id)
+                .orElseThrow();
+        if(Objects.isNull(cyclist.getTeamId())){
+            repository.deleteById(id);
+            return "Cyclist delete id:" + id;
+        }
+        throw new IllegalArgumentException("The rider is currently in a team");
+    }
+
+    public Cyclist updateInfo(Cyclist updatedCyclist, Boolean isTheSameRiderNumber) {
+
+
+        if(Boolean.FALSE.equals(isTheSameRiderNumber)){
+            verifyRiderNumber(updatedCyclist.getRiderNumber());
+        }
+        return repository.save(updatedCyclist);
+    }
+
     private void verifyRiderNumber(Integer riderNumber) {
         int length = String.valueOf(riderNumber).length();
 
@@ -35,16 +65,5 @@ public class CyclistService {
         if(length > 3){
             throw new IllegalArgumentException("Rider number outside the boundaries of 3 digits");
         }
-    }
-
-    public List<Cyclist> getAll() {
-        return repository.findAll();
-    }
-
-    public List<Cyclist>getByCountry(String countryName) {
-        return repository.findAll()
-                .stream()
-                .filter(cyclist -> cyclist.getNationality().equals(countryName.toUpperCase()))
-                .toList();
     }
 }

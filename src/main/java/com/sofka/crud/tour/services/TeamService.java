@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 @Service
 public class TeamService {
@@ -23,6 +22,8 @@ public class TeamService {
         if(newTeam.getName().isEmpty()){
             throw new IllegalArgumentException("Name value can not be empty");
         }
+
+        validateCode(newTeam.getCode());
         return repository.save(newTeam);
     }
 
@@ -41,13 +42,16 @@ public class TeamService {
 
     public Team updateTeam(String id, Team team) {
         Objects.requireNonNull(team.getName());
-        Optional<Team> oldTeam = repository.findById(id);
-        if(Boolean.TRUE.equals(oldTeam.isPresent())){
-            team.setId(id);
-            team.setRiders(oldTeam.get().getRiders());
-            return repository.save(team);
+        Team oldTeam = repository.findById(id)
+                .orElseThrow();
+        Boolean isTheSameCode = oldTeam.getCode().equals(team.getCode());
+
+        if(Boolean.FALSE.equals(isTheSameCode)){
+            validateCode(team.getCode());
         }
-        throw new IllegalArgumentException("Param error can not update team with id:" + id);
+            team.setId(id);
+            team.setRiders(oldTeam.getRiders());
+            return repository.save(team);
     }
 
     public List<Team> getAllTeamsByCountry(String country){
@@ -55,6 +59,17 @@ public class TeamService {
                 .stream()
                 .filter(team -> team.getCountry().equals(country))
                 .toList();
+    }
+
+    private void validateCode(String code) {
+
+        if(code.length() > 3){
+            throw new IllegalArgumentException("Team code is not valid");
+        }
+
+        if(repository.findByCode(code).isPresent()){
+            throw new IllegalArgumentException("Team code is already used");
+        }
     }
 
 }

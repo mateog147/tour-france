@@ -9,6 +9,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Document
 @Data
@@ -47,6 +48,20 @@ public class Team {
             this.riders.remove(cyclist);
         } catch (Exception e) {
             throw new IllegalStateException("Can not remove the cyclist from the given team");
+        }
+    }
+
+    public void updateRider(Cyclist updatedCyclist) {
+        try {
+            this.riders = riders.stream()
+                    .map(cyclist -> {
+                        if (cyclist.getId().equals(updatedCyclist.getId())){
+                            return updatedCyclist;
+                        }
+                        return cyclist;
+                    }).collect(Collectors.toSet());
+        } catch (Exception e) {
+            throw new IllegalArgumentException(e.getMessage());
         }
     }
 }
