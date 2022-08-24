@@ -7,6 +7,5 @@ import java.util.ArrayList;
 import java.util.Optional;
 
 public interface TeamRepository extends MongoRepository<Team, String> {
-    ArrayList<Team> findAll();
     Optional<Team> findByCode(String code);
 }

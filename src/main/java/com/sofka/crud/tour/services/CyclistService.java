@@ -48,11 +48,13 @@ public class CyclistService {
 
     public Cyclist updateInfo(Cyclist updatedCyclist, Boolean isTheSameRiderNumber) {
 
-
         if(Boolean.FALSE.equals(isTheSameRiderNumber)){
             verifyRiderNumber(updatedCyclist.getRiderNumber());
         }
-        return repository.save(updatedCyclist);
+        return repository.save(updatedCyclist
+                .toBuilder()
+                .nationality(updatedCyclist.getNationality().toUpperCase(Locale.ROOT))
+                .build());
     }
 
     private void verifyRiderNumber(Integer riderNumber) {
